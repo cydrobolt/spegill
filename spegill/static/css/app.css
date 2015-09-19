@@ -1,0 +1,16 @@
+.noDisplay {
+    display: none;
+}
+.vertical-center {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+#results {
+    font-size: 66px;
+}
+body {
+    min-height: 100 vh;
+    position: relative;
+    overflow-x: hidden;
+}

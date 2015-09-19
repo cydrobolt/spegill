@@ -5,6 +5,9 @@ __pycache__/
 # node modules
 node_modules
 
+# generated pictures
+spegill/static/*.jpg
+
 # C extensions
 *.so
 

@@ -1,37 +1,20 @@
 {% extends "base.html" %}
+
+{% block head %}
+<link href="/static/css/app.css" rel="stylesheet"></link>
+{% endblock %}
+
 {% block content %}
-<div id="camera"></div>
-<div id="results"></div>
+
+<div class="wrapper text-center vertical-center">
+    <h1 id="results" class="row">Loading <code>spegill</code>...</h1>
+    <span class="text-muted" id="cameraNotice">Please allow access to your camera to continue</span>
+</div>
+
+<div class="noDisplay" id="camera"></div>
+
 <script src="//code.jquery.com/jquery.min.js"></script>
 <script src="/static/js/webcam.js"></script>
-<script>
-    Webcam.set({
-        width: 320,
-        height: 240,
-        image_format: 'jpeg',
-        jpeg_quality: 90,
-        flip_horiz: true
-    });
-    Webcam.attach('#camera');
-
-    function send_snapshot() {
-        // take snapshot and get image data
-        Webcam.snap(function(data_uri) {
-            // display results in page
-            $.ajax({
-                method: "POST",
-                url: "/image_data",
-                data: {"b64_image": data_uri}
-            }).done(function (data) {
-                $("#results").text(data);
-            });
-        });
-    }
-    Webcam.on("live", function () {
-        setInterval(function () {
-            send_snapshot();
-        }, 2500);
-    });
-
-</script>
+<script src='https://code.responsivevoice.org/responsivevoice.js'></script>
+<script src="/static/js/spegill.js"></script>
 {% endblock %}

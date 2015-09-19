@@ -21,6 +21,7 @@ def append_to_redis_array(redis_key, new_entry):
     new_redis_data = json.dumps(current_data)
     rds.set(redis_key, new_redis_data)
 
+current_user = None
 
 @app.route("/speech_data", methods=["GET", "POST"])
 def analyse_text():
