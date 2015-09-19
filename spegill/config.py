@@ -1,4 +1,4 @@
-password = "spegill_says_hi_to_the_nsa"
+password = "spegill_secret_key123"
 debug_mode = True
 app_port = 5000
 app_host = "127.0.0.1"

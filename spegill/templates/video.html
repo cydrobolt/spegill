@@ -1,0 +1,34 @@
+<html>
+<head>
+    <title>spegill active</title>
+</head>
+
+<body>
+    <div id="camera"></div>
+    <div id="results"></div>
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    <script src="/static/js/webcam.js"></script>
+    <script>
+        Webcam.set({
+    		width: 1280,
+    		height: 720,
+    		image_format: 'jpeg',
+    		jpeg_quality: 90
+    	});
+    	Webcam.attach('#camera');
+
+        function take_snapshot() {
+			// take snapshot and get image data
+			Webcam.snap(function(data_uri) {
+				// display results in page
+				return data_uri;
+			});
+		}
+        function send_snapshot(data_uri) {
+            $.ajax({
+              method: "POST",
+              url: "/image_data",
+              data: {"b64_image": data_uri}
+            });
+        }
+    </script>

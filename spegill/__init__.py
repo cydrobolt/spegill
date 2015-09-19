@@ -1,5 +1,5 @@
 from . import config
-from flask import Flask, request
+from flask import Flask, request, render_template
 import indicoio
 import ujson as json
 from RedisLib import rds, R_SPEGILL_USER
@@ -35,14 +35,24 @@ def analyse_text():
         rds.set(spegill_user_redis_key, "1")
 
     indico_response = indicoio.analyze_text(input_text, apis=['named_entities'])
+
+    text_tags = indicoio.text_tags(input_text)
+    text_tags_names = (sorted(text_tags.keys(), key=lambda x: text_tags[x], reverse=True)[:5])
+
     named_entities = indico_response["named_entities"]
     named_entities_names = named_entities.keys()
     append_to_redis_array(spegill_user_redis_key + ":named_entities", named_entities_names)
 
     print named_entities_names
+    print text_tags_names
 
     return "OK"
 
+@app.route("/image_data", methods=["GET", "POST"])
+def analyse_image():
+    image_b64 = request.form['image_b64']
+
+
 @app.route("/")
 def root():
-    return "welcome to spegill"
+    return render_template("video.html")
