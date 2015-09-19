@@ -1,9 +1,9 @@
 from . import config
 from flask import Flask, request, render_template
-import indicoio
+import indicoio, requests
 import ujson as json
 from RedisLib import rds, R_SPEGILL_USER
-
+import base64
 
 indicoio.config.api_key = config.indico_api_key
 
@@ -15,7 +15,7 @@ def append_to_redis_array(redis_key, new_entry):
     # the existing array in `redis_key`
     curr_redis_data = rds.get(redis_key)
     if curr_redis_data == None:
-        curr_redis_data = []
+        curr_redis_data = "[]"
     current_data = json.loads(curr_redis_data)
     current_data += new_entry
     new_redis_data = json.dumps(current_data)
@@ -42,16 +42,26 @@ def analyse_text():
     named_entities = indico_response["named_entities"]
     named_entities_names = named_entities.keys()
     append_to_redis_array(spegill_user_redis_key + ":named_entities", named_entities_names)
+    append_to_redis_array(spegill_user_redis_key + ":text_tags", named_entities_names)
 
     print named_entities_names
     print text_tags_names
-
     return "OK"
 
 @app.route("/image_data", methods=["GET", "POST"])
 def analyse_image():
-    image_b64 = request.form['image_b64']
+    image_b64 = request.form["b64_image"]
+    r = requests.post(config.azure_face_template)
+    r.headers['Content-Type'] = "application/octet-stream"
+    r.headers['Ocp-Apim-Subscription-Key'] = config.azure_api_key
 
+    imgdata = base64.b64decode(image_b64)
+    filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
+    with open(filename, 'wb') as f:
+        f.write(imgdata)
+
+
+    return "OK"
 
 @app.route("/")
 def root():

@@ -13,22 +13,26 @@
     		width: 1280,
     		height: 720,
     		image_format: 'jpeg',
-    		jpeg_quality: 90
+    		jpeg_quality: 90,
+            flip_horiz: true
     	});
     	Webcam.attach('#camera');
 
-        function take_snapshot() {
+        function send_snapshot() {
 			// take snapshot and get image data
 			Webcam.snap(function(data_uri) {
 				// display results in page
-				return data_uri;
+                $.ajax({
+                    method: "POST",
+                    url: "/image_data",
+                    data: {"b64_image": data_uri}
+                });
 			});
 		}
-        function send_snapshot(data_uri) {
-            $.ajax({
-              method: "POST",
-              url: "/image_data",
-              data: {"b64_image": data_uri}
-            });
-        }
+        Webcam.on("live", function () {
+            setInterval(function () {
+                send_snapshot();
+            }, 1000);
+        });
+
     </script>
