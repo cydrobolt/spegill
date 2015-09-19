@@ -1,38 +1,37 @@
-<html>
-<head>
-    <title>spegill active</title>
-</head>
+{% extends "base.html" %}
+{% block content %}
+<div id="camera"></div>
+<div id="results"></div>
+<script src="//code.jquery.com/jquery.min.js"></script>
+<script src="/static/js/webcam.js"></script>
+<script>
+    Webcam.set({
+        width: 320,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90,
+        flip_horiz: true
+    });
+    Webcam.attach('#camera');
 
-<body>
-    <div id="camera"></div>
-    <div id="results"></div>
-    <script src="//code.jquery.com/jquery.min.js"></script>
-    <script src="/static/js/webcam.js"></script>
-    <script>
-        Webcam.set({
-    		width: 1280,
-    		height: 720,
-    		image_format: 'jpeg',
-    		jpeg_quality: 90,
-            flip_horiz: true
-    	});
-    	Webcam.attach('#camera');
-
-        function send_snapshot() {
-			// take snapshot and get image data
-			Webcam.snap(function(data_uri) {
-				// display results in page
-                $.ajax({
-                    method: "POST",
-                    url: "/image_data",
-                    data: {"b64_image": data_uri}
-                });
-			});
-		}
-        Webcam.on("live", function () {
-            setInterval(function () {
-                send_snapshot();
-            }, 1000);
+    function send_snapshot() {
+        // take snapshot and get image data
+        Webcam.snap(function(data_uri) {
+            // display results in page
+            $.ajax({
+                method: "POST",
+                url: "/image_data",
+                data: {"b64_image": data_uri}
+            }).done(function (data) {
+                $("#results").text(data);
+            });
         });
+    }
+    Webcam.on("live", function () {
+        setInterval(function () {
+            send_snapshot();
+        }, 2500);
+    });
 
-    </script>
+</script>
+{% endblock %}

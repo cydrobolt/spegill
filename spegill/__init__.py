@@ -3,7 +3,7 @@ from flask import Flask, request, render_template
 import indicoio, requests
 import ujson as json
 from RedisLib import rds, R_SPEGILL_USER
-import base64
+import base64, hashlib
 
 indicoio.config.api_key = config.indico_api_key
 
@@ -50,18 +50,23 @@ def analyse_text():
 
 @app.route("/image_data", methods=["GET", "POST"])
 def analyse_image():
-    image_b64 = request.form["b64_image"]
-    r = requests.post(config.azure_face_template)
-    r.headers['Content-Type'] = "application/octet-stream"
-    r.headers['Ocp-Apim-Subscription-Key'] = config.azure_api_key
+    image_b64 = request.form["b64_image"][22:]
 
-    imgdata = base64.b64decode(image_b64)
-    filename = 'some_image.jpg'  # I assume you have a way of picking unique filenames
+    img_data = base64.b64decode(image_b64)
+    h = hashlib.sha256()
+    h.update(image_b64)
+    file_hash = h.hexdigest()
+    filename = 'spegill/static/{}.jpg'.format(file_hash)
     with open(filename, 'wb') as f:
-        f.write(imgdata)
+        f.write(img_data)
 
+    spegill_external_path = "{}/{}.jpg".format(config.external_host, file_hash)
 
-    return "OK"
+    facepp_request_path = config.facepp_compiled_path.format(spegill_external_path)
+    print facepp_request_path
+    r = requests.get(facepp_request_path)
+
+    return r.text
 
 @app.route("/")
 def root():
