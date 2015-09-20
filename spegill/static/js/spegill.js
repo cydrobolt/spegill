@@ -214,6 +214,31 @@ function nextTask() {
     }
     tasks.shift();
 }
+window.advertisementNumber = 0;
+function nextAdvertisement(data) {
+    var advertisement = "";
+    switch (advertisementNumber) {
+        case 0:
+            advertisement = "Are you a(n) " + " " + data.race + " " + data.gender + "? We are filming a movie in your area and looking for candidates like you. Contact us today!";
+            break;
+        case 1:
+            advertisement = "Do you miss " + data.country + "? Go back to your home land for only $666";
+            break;
+        case 2:
+            advertisement = "For a limited time " + data.color + " headphones are on sale for $55, exclusive to Spegill users!";
+            break;
+        case 3:
+            advertisement = "Are you a " + data.political + "? Join your local " + data.political + " political group and participate in civics!";
+            break;
+        case 4:
+            advertisementNumber = -1;
+            advertisement = "This billboard is powered by Spegill.";
+            break;
+    }
+    changeText(advertisement);
+    advertisementNumber++;
+
+}
 
 function sendSnapshot() {
     // take snapshot and get image data
@@ -260,6 +285,11 @@ function sendSnapshot() {
                 window.current_dump = data;
                 $("#microphone").hide();
                 changeText("Hey, " + data.name + ", how is it going?");
+                $("body").css("background-color", data.color);
+                setInterval(function () {
+                    // changeText("You're a(n) " + data.political + " "+ data.race + " " + data.gender + " who is from "+ data.country);
+                    nextAdvertisement(data);
+                }, 8000);
                 console.log(current_dump);
             });
 
