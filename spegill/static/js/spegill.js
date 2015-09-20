@@ -115,13 +115,9 @@ function resetPersona() {
     window.glass = "";
     window.smiling = 0;
 }
-
 resetPersona();
-
-window.user_name = "";
-window.current_task = "";
 window.missingFaceCount = 0;
-window.maxMissingFaceCount = 20;
+window.maxMissingFaceCount = 4;
 window.stfu = false;
 window.r = $("#results");
 window.tasks = [
@@ -131,18 +127,7 @@ window.tasks = [
 
     "color",
     "thanks"
-    // "basketball",
-    // "comcast"
 ];
-
-var generalQ = ["What is your name",
-"What country are you from",
-"Did you have an idea of what to make at a hackathon",
-"How are you feeling about your hack"];
-
-
-var indicoQ = ["Political Affiliation for Indico",
-"Who is your favourite basketball player"];
 
 Webcam.set({
     width: 320,
@@ -245,8 +230,5 @@ Webcam.on("live", function () {
     changeText("Hello there!");
     setInterval(function () {
         sendSnapshot();
-    }, 2500);
-    setTimeout(function () {
-        nextTask();
     }, 2500);
 });

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link href="/static/css/app.css" rel="stylesheet"></link>
+{% endblock %}
+
+{% block content %}
+
+<div class = "container" id = "form-submit-ad">
+<h1>Submit an Ad</h1>
+<form class = "form">
+        <div class="input-group">
+            <span class="input-group-addon">Name</span>
+            <input type = "text" class="form-control" name = "name">
+        </div>
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon">Keywords</span>
+            <input type = "text" class="form-control" name = "keywords">
+        </div>
+        <br>
+
+            <label>HTML for Ad</label>
+            <textarea  class="form-control" name = "url"></textarea>
+
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon">Gender</span>
+            <select name ="gender" class="form-control">
+                <option value = "B">Both</option>
+                <option value = "M">Male</option>
+                <option value = "F">Female</option>
+            </select>
+        </div>
+
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon">Politics</span>
+            <select name ="gender" class="form-control">
+                <option value = "all">All</option>
+                <option value = "conservatives">Conservatives</option>
+                <option value = "liberal">Liberal</option>
+                <option value = "ndp">NDP</option>
+                <option value = "green">Green</option>
+            </select>
+        </div>
+        <br>
+        <button type = "submit" class = "btn btn-primary">Add</button>
+    </form>
+</div>
+<script src="//code.jquery.com/jquery.min.js"></script>
+{% endblock %}
+

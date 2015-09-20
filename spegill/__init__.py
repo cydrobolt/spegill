@@ -10,13 +10,6 @@ indicoio.config.api_key = config.indico_api_key
 app = Flask('spegill')
 app.secret_key = config.password
 
-current_expected_intent = ""
-current_talking_user    = ""
-
-intent_entities = {
-    "name": "contact"
-}
-
 def append_to_redis_array(redis_key, new_entry):
     # new_entry is an array that is to be combined with
     # the existing array in `redis_key`
@@ -51,7 +44,6 @@ def analyse_text():
         political_party = indico_response["political"]
         top_political_party = sorted(political_party.keys(), key=lambda x: political_party[x], reverse=True)[0]
         return top_political_party
-
     else:
         indico_response = indicoio.analyze_text(input_text, apis=['keywords'])
 
@@ -78,6 +70,11 @@ def analyse_image():
     r = requests.get(facepp_request_path)
 
     return r.text
+
+
+@app.route("/add")
+def add_ads():
+    return render_template("add.html")
 
 @app.route("/")
 def root():
