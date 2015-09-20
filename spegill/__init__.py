@@ -35,15 +35,6 @@ def analyse_text():
 
     action = request.form.get("action")
 
-    # entity_value = entity["value"]
-
-    # check if user exists in redis
-    spegill_user_redis_key = R_SPEGILL_USER % user_key
-    user_info = rds.get(spegill_user_redis_key)
-
-    if user_info == None:
-        rds.set(spegill_user_redis_key, "1")
-
     if action == "political":
         indico_response = indicoio.analyze_text(input_text, apis=['political'])
         political_party = indico_response["political"]
@@ -70,6 +61,15 @@ def create_person():
     icp = requests.post(post_url)
     return icp.text
 
+@app.route("/update_user_data", methods=["GET", "POST"])
+def update_user_data():
+    person_id = request.form.get("person_id")
+    user_dump = request.form.get("user_dump")
+
+    spegill_user_redis_key = R_SPEGILL_USER % person_id
+    rds.set(spegill_user_redis_key + ":dump", user_dump)
+    return "OK"
+
 @app.route("/image_recog_person", methods=["GET", "POST"])
 def recog_person():
     person_image_url = request.form.get("data_hash")
@@ -78,8 +78,24 @@ def recog_person():
     print post_url
     irp = requests.post(post_url)
     print irp.text
+    irpp = json.loads(irp.text)
+    try:
+        recog_first_match = irpp["face"][0]["candidate"][0]
 
-    return "OK"
+        recog_person_id = recog_first_match["person_id"]
+        recog_person_confidence = recog_first_match["confidence"]
+
+        if recog_person_confidence < 65:
+            return "NO MATCH"
+
+        spegill_user_redis_key = R_SPEGILL_USER % recog_person_id
+        result = rds.get(spegill_user_redis_key + ":dump")
+
+        print recog_first_match
+
+        return result
+    except:
+        return "ERR"
 
 @app.route("/image_data", methods=["GET", "POST"])
 def analyse_image():

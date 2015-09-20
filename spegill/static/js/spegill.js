@@ -4,6 +4,7 @@ window.persona = new Persona();
 window.expected_intent = "";
 window.face_id_list = [];
 window.maxFacesPerPerson = 100;
+window.current_dump = [];
 
 persona.on('change:political', function(model, name) {
     nextTask();
@@ -17,6 +18,24 @@ persona.on('change:color', function(model, name) {
 persona.on('change:name', function(model, name) {
     nextTask();
 });
+
+function getUserDump() {
+    var userDict = {
+        "age": persona.get("age"),
+        "gender": persona.get('gender'),
+        "race": persona.get('race'),
+        "glass": persona.get('glass'),
+        "smiling": persona.get('smiling'),
+
+        "country": persona.get("country"),
+        "political": persona.get("political"),
+        "color": persona.get("color"),
+        "name": persona.get("name")
+    };
+    var userDump = JSON.stringify(userDict);
+    return userDump;
+}
+
 
 var mic = new Wit.Microphone(document.getElementById("microphone"));
     mic.onready = function () {
@@ -38,9 +57,9 @@ var mic = new Wit.Microphone(document.getElementById("microphone"));
                 data: {"text": fullText, "action": "political"},
             }).done(function (data) {
                 changeText("Sounds like you're a " + data + "?");
+                expected_intent = "";
                 setTimeout(function () {
                     persona.set("political", data);
-                    expected_intent = "";
                 }, 3600);
             });
         }
@@ -180,8 +199,16 @@ function nextTask() {
                 method: "POST",
                 url: "/image_create_person",
                 data: {"face_id_list": JSON.stringify(face_id_list.slice(0, maxFacesPerPerson))},
+                dataType: "json"
             }).done(function (data) {
-                console.log("Saved user as "+ data);
+                var userDump = getUserDump();
+                $.ajax({
+                    method: "POST",
+                    url: "/update_user_data",
+                    data: {"person_id": data.person_id, "user_dump": userDump},
+                });
+                console.log("Saved user as");
+                console.log(data);
             });
             break;
     }
@@ -198,9 +225,8 @@ function sendSnapshot() {
             data: {"b64_image": data_uri},
             dataType: "json"
         }).done(function (data_raw) {
-            var data = data_raw.o;
+            var data = JSON.parse(data_raw.o);
             var file_hash = data_raw.ha;
-            console.log(data);
             var faceAttributes = data.face;
             if (faceAttributes.length === 0) {
                 missingFaceCount++;
@@ -227,8 +253,14 @@ function sendSnapshot() {
                 dataType: "json"
             }).done(function (data) {
                 // receive user information
+                if (data.name == current_dump.name) {
+                    console.log("same person, skipping");
+                    return;
+                }
+                window.current_dump = data;
                 $("#microphone").hide();
                 changeText("Hey, " + data.name + ", how is it going?");
+                console.log(current_dump);
             });
 
             stfu = false;
