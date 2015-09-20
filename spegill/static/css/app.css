@@ -6,6 +6,32 @@
     top: 50%;
     transform: translateY(-50%);
 }
+.form-control{
+    background-color: rgba(0,0,0,0.5);
+    transition:0.75s all;
+    color:#fff;
+}
+.form-control:hover,
+.form-control:active,
+.advertisement:hover,
+.advertisement:active{
+    background-color: rgba(0,0,0,0.3);
+
+}
+.advertisement{
+    background-color: rgba(0,0,0,0.5);
+    transition:0.75s all;
+    width:300px;
+    padding:20px 15px;
+    color:#fff;
+}
+.advertisement h1{
+    font-size: 20px;
+    text-transform: capitalize;
+}
+#form-submit-ad{
+    margin-top: 40px;
+}
 #results {
     font-size: 66px;
 }
@@ -13,6 +39,4 @@ body {
     min-height: 100 vh;
     position: relative;
     overflow-x: hidden;
-    margin-left: 80px;
-    margin-right: 80px;
 }
