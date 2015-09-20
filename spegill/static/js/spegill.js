@@ -8,11 +8,16 @@ var Persona = Backbone.Model.extend({
 window.persona = new Persona();
 window.expected_intent = "";
 
-persona.on('change:name', function(model, name) {
+persona.on('change:political', function(model, name) {
     nextTask();
 });
-
-persona.on('change:country', function(model, country) {
+persona.on('change:country', function(model, name) {
+    nextTask();
+});
+persona.on('change:color', function(model, name) {
+    nextTask();
+});
+persona.on('change:name', function(model, name) {
     nextTask();
 });
 
@@ -27,6 +32,21 @@ var mic = new Wit.Microphone(document.getElementById("microphone"));
         console.info("Recording stopped, processing started");
     };
     mic.onresult = function (intent, entities, fullText) {
+        console.log(fullText);
+        if (expected_intent == "political") {
+            // send to indico
+            $.ajax({
+                method: "POST",
+                url: "/text_data",
+                data: {"text": fullText, "action": "political"},
+            }).done(function (data) {
+                changeText("Sounds like you're a " + data + "?");
+                setTimeout(function () {
+                    persona.set("political", data);
+                    expected_intent = "";
+                }, 3600);
+            });
+        }
         switch (intent) {
             case "name":
                 try {
@@ -44,18 +64,14 @@ var mic = new Wit.Microphone(document.getElementById("microphone"));
                     changeText("Hmm. I didn't quite get what country you were referring to.");
                 }
                 break;
-            default:
-                if (expected_intent == "political") {
-                    // send to indico
-                    $.ajax({
-                        method: "POST",
-                        url: "/speech_data",
-                        data: {"text": fullText},
-                        dataType: "json"
-                    }).done(function () {
-
-                    });
+            case "color":
+                try {
+                    persona.set("color", entities.color.value);
                 }
+                catch (err) {
+                    changeText("Hmm. That's a color? :/");
+                }
+                break;
         }
 
         var r = kv("intent", intent);
@@ -113,7 +129,8 @@ window.tasks = [
     "country",
     "political",
 
-    "hobbies",
+    "color",
+    "thanks"
     // "basketball",
     // "comcast"
 ];
@@ -166,12 +183,17 @@ function nextTask() {
         case "political":
             changeText("Woah! "+ persona.get("country") + " is a great country! My uncle was from " + persona.get("country") + ".");
             setTimeout(function () {
-                changeText("As 2016 is getting closer, conversations about where America should be going are becoming prevalent. What do you think the U.S should change?");
-            }, 3200);
-            expected_intent = "political";
+                changeText("I'm actually from America, though. What do you think the U.S should change?");
+                expected_intent = "political";
+            }, 6500);
             break;
-        case "hobbies":
-            expected_intent = "";
+        case "color":
+            changeText("What is your favorite color?");
+            break;
+        case "thanks":
+            var color = persona.get("color");
+            changeText("I love " + color + "! It was great talking to you! I hope we'll see each other in the future. I'll certainly remember your face! ;)");
+            $("body").css("background-color", color);
             break;
     }
     tasks.shift();
@@ -191,7 +213,7 @@ function sendSnapshot() {
             var faceAttributes = data.face;
             if (faceAttributes.length === 0) {
                 missingFaceCount++;
-                if ((missingFaceCount > maxMissingFaceCount) && (stfu != true)) {
+                if ((missingFaceCount > maxMissingFaceCount) && (stfu !== true)) {
                     changeText("Goodbye! See you later.");
                     setTimeout(function () {
                         r.text("Welcome to Spegill! Please look at the camera to continue. One person at a time, please.");
@@ -208,11 +230,13 @@ function sendSnapshot() {
             stfu = false;
             missingFaceCount = 0;
             faceAttributes = faceAttributes[0].attribute;
-            age = faceAttributes.age.value;
-            gender = faceAttributes.gender.value;
-            race = faceAttributes.race.value;
-            glass = faceAttributes.glass.value;
-            smiling = faceAttributes.smiling.value;
+            if (!persona.get("age")) {
+                persona.set("age", faceAttributes.age.value);
+                persona.set('gender', faceAttributes.gender.value);
+                persona.set('race', faceAttributes.race.value);
+                persona.set('glass', faceAttributes.glass.value);
+                persona.set('smiling', faceAttributes.smiling.value);
+            }
         });
     });
 }

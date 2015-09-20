@@ -30,12 +30,14 @@ def append_to_redis_array(redis_key, new_entry):
 
 current_user = None
 
-@app.route("/speech_data", methods=["GET", "POST"])
+@app.route("/text_data", methods=["GET", "POST"])
 def analyse_text():
     input_text = request.form["text"]
     user_key   = current_talking_user
 
-    entity_value = entity["value"]
+    action = request.form.get("action")
+
+    # entity_value = entity["value"]
 
     # check if user exists in redis
     spegill_user_redis_key = R_SPEGILL_USER % user_key
@@ -44,24 +46,18 @@ def analyse_text():
     if user_info == None:
         rds.set(spegill_user_redis_key, "1")
 
-    indico_response = indicoio.analyze_text(input_text, apis=['named_entities'])
+    if action == "political":
+        indico_response = indicoio.analyze_text(input_text, apis=['political'])
+        political_party = indico_response["political"]
+        top_political_party = sorted(political_party.keys(), key=lambda x: political_party[x], reverse=True)[0]
+        return top_political_party
 
-    text_tags = indicoio.text_tags(input_text)
-    text_tags_names = (sorted(text_tags.keys(), key=lambda x: text_tags[x], reverse=True)[:5])
+    else:
+        indico_response = indicoio.analyze_text(input_text, apis=['keywords'])
 
-    named_entities = indico_response["named_entities"]
-    named_entities_names = named_entities.keys()
-    append_to_redis_array(spegill_user_redis_key + ":named_entities", named_entities_names)
-    append_to_redis_array(spegill_user_redis_key + ":text_tags", named_entities_names)
-
-    print named_entities_names
-    print text_tags_names
-
-    sio.send({
-        "named_ent": named_entities_names,
-        "ent_val": entity_value
-    }, json=True)
-    return "OK"
+        keywords = indico_response["keywords"]
+        keywords_ = (sorted(keywords.keys(), key=lambda x: keywords[x], reverse=True)[:5])
+        return keywords_
 
 @app.route("/image_data", methods=["GET", "POST"])
 def analyse_image():
