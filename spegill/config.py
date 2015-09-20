@@ -16,6 +16,13 @@ facepp_api_secret = "oIAftLdzUSlJ2pKrWCXUUA3DYUG7msQ5"
 facepp_api_path = "http://apius.faceplusplus.com/v2/detection/detect?api_key={}&api_secret={}&attribute=glass,pose,gender,age,race,smiling&url={{}}"
 facepp_compiled_path = facepp_api_path.format(facepp_api_key, facepp_api_secret)
 
+facepp_person_api_path = "https://apius.faceplusplus.com/v2/person/create?api_key={}&api_secret={}&face_id={{}}"
+facepp_compiled_person_path = facepp_person_api_path.format(facepp_api_key, facepp_api_secret)
+
+facepp_person_get = "https://apius.faceplusplus.com/v2/recognition/identify?url={{}}&api_secret={}&api_key={}"
+facepp_compiled_person_get_path = facepp_person_api_path.format(facepp_api_key, facepp_api_secret)
+
+
 wit_ai_path = "https://api.wit.ai/message?v=20150919&q={}"
 
 # external static file host

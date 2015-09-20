@@ -2,6 +2,8 @@ var Persona = Backbone.Model.extend({});
 
 window.persona = new Persona();
 window.expected_intent = "";
+window.face_id_list = [];
+window.maxFacesPerPerson = 100;
 
 persona.on('change:political', function(model, name) {
     nextTask();
@@ -174,6 +176,13 @@ function nextTask() {
             var color = persona.get("color");
             changeText("I love " + color + "! It was great talking to you! I hope we'll see each other in the future. I'll certainly remember your face! ;)");
             $("body").css("background-color", color);
+            $.ajax({
+                method: "POST",
+                url: "/image_create_person",
+                data: {"face_id_list": JSON.dump(face_id_list.slice(0, maxFacesPerPerson))},
+            }).done(function (data) {
+                console.log("Saved user as "+ data);
+            });
             break;
     }
     tasks.shift();
@@ -191,6 +200,8 @@ function sendSnapshot() {
         }).done(function (data) {
             console.log(data);
             var faceAttributes = data.face;
+            var face_id = faceAttributes.face_id;
+            face_id_list.push(face_id);
             if (faceAttributes.length === 0) {
                 missingFaceCount++;
                 if ((missingFaceCount > maxMissingFaceCount) && (stfu !== true)) {
@@ -203,9 +214,21 @@ function sendSnapshot() {
                 resetPersona();
                 return;
             }
-            if (faceAttributes > 1) {
+            if (faceAttributes.length > 1) {
                 changeText("Only one person at a time should be in the frame.");
             }
+
+            // check if we recognise this person's face
+            $.ajax({
+                method: "POST",
+                url: "/image_recog_person",
+                data: {"b64_image": data_uri},
+                dataType: "json"
+            }).done(function (data) {
+                // receive user information
+                $("#microphone").hide();
+                changeText("Hey, " + data.name + ", how is it going?");
+            });
 
             stfu = false;
             missingFaceCount = 0;

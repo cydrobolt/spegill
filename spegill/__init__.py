@@ -52,6 +52,29 @@ def analyse_text():
         keywords_ = (sorted(keywords.keys(), key=lambda x: keywords[x], reverse=True)[:5])
         return keywords_
 
+
+@app.route("/image_create_person", methods=["GET", "POST"])
+def create_person():
+    face_id_list = request.form.get("face_id_list")
+
+    obj_id_list = json.loads(face_id_list)
+    obj_csv_id_list = ",".join(obj_id_list)
+
+    post_url = config.facepp_compiled_person_path.format(obj_csv_id_list)
+    icp = requests.post(post_url)
+    return icp.text
+
+@app.route("/image_recog_person", methods=["GET", "POST"])
+def recog_person():
+    person_image_url = request.form.get("person_image_url")
+
+    post_url = config.facepp_compiled_person_get_path.format(person_image_url)
+    print post_url
+    irp = requests.post(post_url)
+    print irp.text
+
+    return "OK"
+
 @app.route("/image_data", methods=["GET", "POST"])
 def analyse_image():
     image_b64 = request.form["b64_image"][22:]
