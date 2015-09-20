@@ -2,6 +2,8 @@
 
 {% block head %}
 <link href="/static/css/app.css" rel="stylesheet"></link>
+<link href="/static/js/wit-mic/microphone.min.css" rel="stylesheet"></link>
+
 {% endblock %}
 
 {% block content %}
@@ -9,11 +11,15 @@
 <div class="wrapper text-center vertical-center">
     <h1 id="results" class="row">Loading <code>spegill</code>...</h1>
     <span class="text-muted" id="cameraNotice">Please allow access to your camera to continue</span>
+    <div id="microphone"></div>
 </div>
 
 <div class="noDisplay" id="camera"></div>
 
 <script src="//code.jquery.com/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js"></script>
+<script src="/static/js/wit-mic/microphone.min.js"></script>
 <script src="/static/js/webcam.js"></script>
 <script src='https://code.responsivevoice.org/responsivevoice.js'></script>
 <script src="/static/js/spegill.js"></script>

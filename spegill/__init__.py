@@ -10,6 +10,13 @@ indicoio.config.api_key = config.indico_api_key
 app = Flask('spegill')
 app.secret_key = config.password
 
+current_expected_intent = ""
+current_talking_user    = ""
+
+intent_entities = {
+    "name": "contact"
+}
+
 def append_to_redis_array(redis_key, new_entry):
     # new_entry is an array that is to be combined with
     # the existing array in `redis_key`
@@ -26,7 +33,9 @@ current_user = None
 @app.route("/speech_data", methods=["GET", "POST"])
 def analyse_text():
     input_text = request.form["text"]
-    user_key   = request.form["key"]
+    user_key   = current_talking_user
+
+    entity_value = entity["value"]
 
     # check if user exists in redis
     spegill_user_redis_key = R_SPEGILL_USER % user_key
@@ -47,6 +56,11 @@ def analyse_text():
 
     print named_entities_names
     print text_tags_names
+
+    sio.send({
+        "named_ent": named_entities_names,
+        "ent_val": entity_value
+    }, json=True)
     return "OK"
 
 @app.route("/image_data", methods=["GET", "POST"])

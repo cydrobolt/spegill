@@ -13,4 +13,6 @@ body {
     min-height: 100 vh;
     position: relative;
     overflow-x: hidden;
+    margin-left: 80px;
+    margin-right: 80px;
 }
