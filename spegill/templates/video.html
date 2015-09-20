@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<link href="/static/css/app.css" rel="stylesheet"></link>
+<link href="/static/css/app.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -9,6 +9,7 @@
 <div class="wrapper text-center vertical-center">
     <h1 id="results" class="row">Loading <code>spegill</code>...</h1>
     <span class="text-muted" id="cameraNotice">Please allow access to your camera to continue</span>
+    <div id="microphone"></div>
 </div>
 
 <div class="noDisplay" id="camera"></div>

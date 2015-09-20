@@ -1,9 +1,4 @@
-var Persona = Backbone.Model.extend({
-  promptColor: function() {
-    var cssColor = prompt("Please enter a CSS color:");
-    this.set({color: cssColor});
-  }
-});
+var Persona = Backbone.Model.extend({});
 
 window.persona = new Persona();
 window.expected_intent = "";
@@ -117,7 +112,7 @@ function resetPersona() {
 }
 resetPersona();
 window.missingFaceCount = 0;
-window.maxMissingFaceCount = 4;
+window.maxMissingFaceCount = 20;
 window.stfu = false;
 window.r = $("#results");
 window.tasks = [
@@ -230,5 +225,8 @@ Webcam.on("live", function () {
     changeText("Hello there!");
     setInterval(function () {
         sendSnapshot();
+    }, 2500);
+    setTimeout(function () {
+        nextTask();
     }, 2500);
 });

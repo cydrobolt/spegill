@@ -9,6 +9,7 @@ indicoio.config.api_key = config.indico_api_key
 
 app = Flask('spegill')
 app.secret_key = config.password
+current_talking_user = ""
 
 def append_to_redis_array(redis_key, new_entry):
     # new_entry is an array that is to be combined with
