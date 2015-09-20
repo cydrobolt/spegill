@@ -22,6 +22,10 @@ def append_to_redis_array(redis_key, new_entry):
     new_redis_data = json.dumps(current_data)
     rds.set(redis_key, new_redis_data)
 
+def get_external_link(file_hash):
+    return "{}/{}.jpg".format(config.external_host, file_hash)
+
+
 current_user = None
 
 @app.route("/text_data", methods=["GET", "POST"])
@@ -57,6 +61,8 @@ def analyse_text():
 def create_person():
     face_id_list = request.form.get("face_id_list")
 
+    print face_id_list
+
     obj_id_list = json.loads(face_id_list)
     obj_csv_id_list = ",".join(obj_id_list)
 
@@ -66,7 +72,7 @@ def create_person():
 
 @app.route("/image_recog_person", methods=["GET", "POST"])
 def recog_person():
-    person_image_url = request.form.get("person_image_url")
+    person_image_url = request.form.get("data_hash")
 
     post_url = config.facepp_compiled_person_get_path.format(person_image_url)
     print post_url
@@ -87,13 +93,13 @@ def analyse_image():
     with open(filename, 'wb') as f:
         f.write(img_data)
 
-    spegill_external_path = "{}/{}.jpg".format(config.external_host, file_hash)
+    spegill_external_path = get_external_link(file_hash)
 
     facepp_request_path = config.facepp_compiled_path.format(spegill_external_path)
     print facepp_request_path
     r = requests.get(facepp_request_path)
 
-    return r.text
+    return json.dumps({"o": r.text, "ha": spegill_external_path})
 
 
 @app.route("/add")

@@ -179,7 +179,7 @@ function nextTask() {
             $.ajax({
                 method: "POST",
                 url: "/image_create_person",
-                data: {"face_id_list": JSON.dump(face_id_list.slice(0, maxFacesPerPerson))},
+                data: {"face_id_list": JSON.stringify(face_id_list.slice(0, maxFacesPerPerson))},
             }).done(function (data) {
                 console.log("Saved user as "+ data);
             });
@@ -197,11 +197,11 @@ function sendSnapshot() {
             url: "/image_data",
             data: {"b64_image": data_uri},
             dataType: "json"
-        }).done(function (data) {
+        }).done(function (data_raw) {
+            var data = data_raw.o;
+            var file_hash = data_raw.ha;
             console.log(data);
             var faceAttributes = data.face;
-            var face_id = faceAttributes.face_id;
-            face_id_list.push(face_id);
             if (faceAttributes.length === 0) {
                 missingFaceCount++;
                 if ((missingFaceCount > maxMissingFaceCount) && (stfu !== true)) {
@@ -217,12 +217,13 @@ function sendSnapshot() {
             if (faceAttributes.length > 1) {
                 changeText("Only one person at a time should be in the frame.");
             }
-
+            var face_id = faceAttributes[0].face_id;
+            face_id_list.push(face_id);
             // check if we recognise this person's face
             $.ajax({
                 method: "POST",
                 url: "/image_recog_person",
-                data: {"b64_image": data_uri},
+                data: {"data_hash": file_hash},
                 dataType: "json"
             }).done(function (data) {
                 // receive user information
