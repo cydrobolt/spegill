@@ -56,7 +56,7 @@ var mic = new Wit.Microphone(document.getElementById("microphone"));
                 url: "/text_data",
                 data: {"text": fullText, "action": "political"},
             }).done(function (data) {
-                changeText("Sounds like you're a " + data + "?");
+                changeText("Sounds like you're a " + data + ".");
                 expected_intent = "";
                 setTimeout(function () {
                     persona.set("political", data);
