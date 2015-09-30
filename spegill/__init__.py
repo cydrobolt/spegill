@@ -52,14 +52,11 @@ def analyse_text():
 def create_person():
     face_id_list = request.form.get("face_id_list")
 
-    print face_id_list
-
     obj_id_list = json.loads(face_id_list)
     obj_csv_id_list = ",".join(obj_id_list)
 
     post_url = config.facepp_compiled_person_path.format(obj_csv_id_list)
     icp = requests.post(post_url)
-    return icp.text
 
 @app.route("/update_user_data", methods=["GET", "POST"])
 def update_user_data():
@@ -75,9 +72,7 @@ def recog_person():
     person_image_url = request.form.get("data_hash")
 
     post_url = config.facepp_compiled_person_get_path.format(person_image_url)
-    print post_url
     irp = requests.post(post_url)
-    print irp.text
     irpp = json.loads(irp.text)
     try:
         recog_first_match = irpp["face"][0]["candidate"][0]
@@ -90,8 +85,6 @@ def recog_person():
 
         spegill_user_redis_key = R_SPEGILL_USER % recog_person_id
         result = rds.get(spegill_user_redis_key + ":dump")
-
-        print recog_first_match
 
         return result
     except:
@@ -112,7 +105,6 @@ def analyse_image():
     spegill_external_path = get_external_link(file_hash)
 
     facepp_request_path = config.facepp_compiled_path.format(spegill_external_path)
-    print facepp_request_path
     r = requests.get(facepp_request_path)
 
     return json.dumps({"o": r.text, "ha": spegill_external_path})
