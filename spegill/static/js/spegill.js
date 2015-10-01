@@ -116,7 +116,7 @@ var mic = new Wit.Microphone(document.getElementById("microphone"));
     console.info("Microphone is not connected");
   };
 
-  mic.connect("V3BCSB5DFN5CCIN6CXWWJAHWIC5XNJMJ");
+  mic.connect("");
   function kv (k, v) {
     if (toString.call(v) !== "[object String]") {
         v = JSON.stringify(v);
