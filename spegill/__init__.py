@@ -58,6 +58,8 @@ def create_person():
     post_url = config.facepp_compiled_person_path.format(obj_csv_id_list)
     icp = requests.post(post_url)
 
+    return icp.text
+
 @app.route("/update_user_data", methods=["GET", "POST"])
 def update_user_data():
     person_id = request.form.get("person_id")
