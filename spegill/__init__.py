@@ -26,6 +26,12 @@ def get_external_link(file_hash):
     return "{}/{}.jpg".format(config.external_host, file_hash)
 
 
+def retrain_dataset():
+    retrain_url = "https://apius.faceplusplus.com/v2/train/identify?api_secret={}&api_key={}&group_name=main".format(
+        config.facepp_api_secret, config.facepp_api_key
+    )
+    return requests.get(retrain_url).text
+
 current_user = None
 
 @app.route("/text_data", methods=["GET", "POST"])
@@ -67,6 +73,8 @@ def update_user_data():
 
     spegill_user_redis_key = R_SPEGILL_USER % person_id
     rds.set(spegill_user_redis_key + ":dump", user_dump)
+
+    retrain_dataset()
     return "OK"
 
 @app.route("/image_recog_person", methods=["GET", "POST"])
